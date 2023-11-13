@@ -90,7 +90,7 @@
         <button class="accordion">The Solid State</button>
         <div class="panel">
             <p>
-                <iframe src="https://www.youtube.com/embed/YgPZKKzEtS4?rel=0&control=0&modestbranding=1" allow="fullscreen" loading="lazy"></iframe>
+                <iframe src="https://www.youtube.com/embed/YgPZKKzEtS4?rel=0&control=0&modestbranding=1" allow="fullscreen" loading="lazy" width="100%" class="myIframe"></iframe>
             </p>
             <!-- Add other videos here -->
         </div>
@@ -101,6 +101,8 @@
 
 <!-- JavaScript for handling accordion functionality -->
 <script>
+type="text/javascript" language="javascript"> 
+$('.myIframe').css('height', $(window).height()+'px');
     var acc = document.getElementsByClassName("accordion");
     var i;
 
