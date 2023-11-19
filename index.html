@@ -95,6 +95,21 @@
         <button class="accordion" onclick="loadContentSet3()">Electrochemistry</button>
     </div>
 
+    <div class="accordion-container">
+        <h2 id="yn202ma" style="color:#ffffff">YN 202 MA</h2>
+        <button class="accordion" onclick="loadContentSet12()">The Solid State</button>
+        <button class="accordion" onclick="loadContentSet23()">Solution</button>
+        <button class="accordion" onclick="loadContentSet34()">Electrochemistry</button>
+    </div>
+
+    <div class="accordion-container">
+        <h2 id="yn203ma" style="color:#ffffff">YN 203 MA</h2>
+        <button class="accordion" onclick="loadContentSet11()">The Solid State</button>
+        <button class="accordion" onclick="loadContentSet22()">Solution</button>
+        <button class="accordion" onclick="loadContentSet33()">Electrochemistry</button>
+    </div>
+
+
 <!-- ... (unchanged code) ... -->
 
 <script>
@@ -118,17 +133,18 @@
         navigateToViewport(videoIds, pdfIds);
     }
 
-https://drive.google.com/file/d/1RVUq2pIBpwLE94_ijQ2hiEoHoWBV0mB9/view?usp=drive_link
+function navigateToViewport(videoIds, pdfIds) {
+    const videoCount = videoIds.length;
+    const pdfCount = pdfIds.length;
 
+    // Convert the arrays to JSON strings to pass as URL parameters
+    const videoIdsParam = encodeURIComponent(JSON.stringify(videoIds));
+    const pdfIdsParam = encodeURIComponent(JSON.stringify(pdfIds));
 
-    function navigateToViewport(videoIds, pdfIds) {
-        const videoCount = videoIds.length;
-        const pdfCount = pdfIds.length;
-        const videoIdParam = videoIds.map(id => `videoId=${id}`).join('&');
-        const pdfIdParam = pdfIds.map(id => `pdfId=${id}`).join('&');
-        const url = `viewport.html?${videoIdParam}&${pdfIdParam}&videoCount=${videoCount}&pdfCount=${pdfCount}`;
-        window.location.href = url;
-    }
+    const url = `viewport.html?videoIds=${videoIdsParam}&pdfIds=${pdfIdsParam}&videoCount=${videoCount}&pdfCount=${pdfCount}`;
+    window.location.href = url;
+}
+
 </script>
 
 <!-- ... (unchanged code) ... -->
