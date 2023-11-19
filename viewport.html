@@ -7,7 +7,8 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body {
+        /* ... (styles remain unchanged) ... */
+body {
             font-family: 'Roboto', Arial, Helvetica, sans-serif;
             background-color: #444;
             margin: 0;
@@ -99,10 +100,18 @@
             background-color: #AAA;
         }
 
-        .video-iframe {
-            width: 100%;
-            height: 100%;
-        }
+.video-iframe {
+    width: 286;
+    height: 154;
+    padding-bottom: 10%;
+    position: relative;
+}
+
+@media screen and (max-width: 768px) {
+    .video-iframe {
+        padding-bottom: 75%; /* Adjust the aspect ratio for smaller screens if needed */
+    }
+}
 
         .pdf-section {
             display: flex;
@@ -148,6 +157,7 @@
                 padding: 1rem;
             }
         }
+
     </style>
     <title>View Dock</title>
 </head>
@@ -168,7 +178,7 @@
     </div>
     <div class="pdf-section" id="pdfSection" style="display: none;">
 
-        <!-- Buttons will be dynamically added here -->
+        <!-- Buttons for downloading PDF documents will be dynamically added here -->
 
     </div>
 
@@ -180,13 +190,31 @@
             videoIds.forEach((videoId, index) => {
                 const iframe = document.createElement('iframe');
                 iframe.className = 'video-iframe';
-                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&`;
                 iframe.frameBorder = '0';
                 iframe.allowFullscreen = true;
                 videoPlayer.appendChild(iframe);
             });
 
             document.getElementById('pdfSection').style.display = 'none';
+        }
+
+        function loadDocuments(pdfIds) {
+            const pdfSection = document.getElementById('pdfSection');
+            pdfSection.innerHTML = ''; // Clear previous buttons
+
+            pdfIds.forEach((pdfId, index) => {
+                const button = document.createElement('button');
+                button.className = 'download-button';
+                button.innerHTML = `Download Document ${index + 1}`;
+                button.onclick = function () {
+                    window.open(`https://drive.google.com/uc?export=download&id=${pdfId}`, '_blank');
+                };
+                pdfSection.appendChild(button);
+            });
+
+            document.getElementById('pdfSection').style.display = 'flex';
+            document.getElementById('videoPlayer').innerHTML = ''; // Clear video player
         }
 
         function toggleCategory(category) {
@@ -198,35 +226,27 @@
             const activeButton = document.querySelector(`[data-category="${category}"]`);
             activeButton.classList.add('active');
 
+            const urlParams = new URLSearchParams(window.location.search);
+        const videoIdsParam = urlParams.get('videoIds');
+        const pdfIdsParam = urlParams.get('pdfIds');
+
+        // Convert the JSON strings back to arrays
+        const videoIds = JSON.parse(decodeURIComponent(videoIdsParam));
+        const pdfIds = JSON.parse(decodeURIComponent(pdfIdsParam));
+
+        // Debugging: Print the values of videoIds and pdfIds
+        console.log('videoIds:', videoIds);
+        console.log('pdfIds:', pdfIds);
+        
+
+            // Debugging: Print the values of pdfIds and videoIds
+            //console.log('pdfIds:', pdfIds);
+            //console.log('videoIds:', videoIds);
+
             if (category === 'LECTURE') {
-                loadVideos(['VIDEO_ID_LECTURE_1']); // Change the default video ID if needed
+                loadVideos(videoIds);
             } else if (category === 'NOTES') {
-                document.getElementById('videoPlayer').innerHTML = ''; // Clear video player
-                document.getElementById('pdfSection').style.display = 'flex';
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const numberOfPDFIds = parseInt(urlParams.get('pdfCount')) || 0;
-                const numberOfVideoIds = parseInt(urlParams.get('videoCount')) || 0;
-
-                const pdfIds = Array.from({ length: numberOfPDFIds }, (_, index) => `PDF_ID_${index + 1}`);
-                const videoIds = Array.from({ length: numberOfVideoIds }, (_, index) => `VIDEO_ID_${index + 1}`);
-
-                if (category === 'LECTURE') {
-                    loadVideos(videoIds);
-                } else if (category === 'NOTES') {
-                    const pdfSection = document.getElementById('pdfSection');
-                    pdfSection.innerHTML = ''; // Clear previous buttons
-
-                    pdfIds.forEach((pdfId, index) => {
-                        const button = document.createElement('button');
-                        button.className = 'download-button';
-                        button.innerHTML = `Download Document ${index + 1}`;
-                        button.onclick = function () {
-                            loadDocument(`https://drive.google.com/uc?export=download&id=${pdfId}`);
-                        };
-                        pdfSection.appendChild(button);
-                    });
-                }
+                loadDocuments(pdfIds);
             }
         }
 
