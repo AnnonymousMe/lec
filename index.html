@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-        <meta charset="UTF-8">
+    <meta charset="UTF-8">
     <title>Sagar Sir</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -75,7 +75,6 @@
 </head>
 
 <body>
-
 
     <div class="navbar">
         <b> Physics❤️Wallah
@@ -154,10 +153,8 @@
 
 <!-- ... (script snippet) ... -->
 
-
-    <script>
-
-            function loadContentSetln102eac1() {
+<script>
+    function loadContentSetln102eac1() {
         const videoIds = ['YgPZKKzEtS4', 'VbDSZ6wIrLQ', 'OusNe3rIqs8', 'Fe8yteVgx0w', 'vkYQ4AnbMx4','kHOm4J2rLBA','6qf97xc8nms'];
         const pdfIds = ['1RVUq2pIBpwLE94_ijQ2hiEoHoWBV0mB9', '11lOrg0_lX0jIJGi5aczjGarfOy9ejpeT', '1BVGfHZA-u2stX9M3nT4qFiCRBNB7v0yO', '1m3lrDJZYhv34coMGtepKr36csx1cNzoN','1b9s5jsooJHN3SNGKRwenM0zU-MGfLEE5','1ZwIMiMIQnK34ADpFQJlYk66xskx08waq','1XSAsdVoUsmrSUYCRW2VgZjKA83NInPCt'];
         navigateToViewport(videoIds, pdfIds);
@@ -177,60 +174,23 @@
         navigateToViewport(videoIds, pdfIds);
     }
 
+function navigateToViewport(videoIds, pdfIds) {
+    const videoCount = videoIds.length;
+    const pdfCount = pdfIds.length;
+
+    // Convert the arrays to JSON strings to pass as URL parameters
+    const videoIdsParam = encodeURIComponent(JSON.stringify(videoIds));
+    const pdfIdsParam = encodeURIComponent(JSON.stringify(pdfIds));
+
+    const url = `viewport.html?videoIds=${videoIdsParam}&pdfIds=${pdfIdsParam}&videoCount=${videoCount}&pdfCount=${pdfCount}`;
+    window.location.href = url;
+}
+
+</script>
+
+<!-- ... (script snippet) ... -->
 
 
-        // Function to encrypt data
-        async function encryptData(data, key) {
-            const enc = new TextEncoder();
-            const encodedKey = enc.encode(key);
-            const encodedData = enc.encode(data);
-
-            await crypto.subtle.importKey(
-                'raw',
-                encodedKey,
-                { name: 'AES-CBC' },
-                false,
-                ['encrypt']
-            );
-
-            return crypto.subtle.encrypt(
-                { name: 'AES-CBC', iv: encodedKey.slice(0, 16) },
-                encodedKey,
-                encodedData
-            );
-        }
-
-        // Wait for the crypto library to be ready
-        window.addEventListener('DOMContentLoaded', (event) => {
-            if (crypto.subtle) {
-                console.log('Crypto library is ready.');
-            } else {
-                console.error('Crypto library is not available.');
-            }
-        });
-
-        function navigateToViewport(videoIds, pdfIds) {
-            const encryptionKey = 'tejasvi';
-
-            // Convert the arrays to JSON strings to pass as URL parameters
-            const videoIdsParam = JSON.stringify(videoIds);
-            const pdfIdsParam = JSON.stringify(pdfIds);
-
-            // Encrypt the data
-            Promise.all([encryptData(videoIdsParam, encryptionKey), encryptData(pdfIdsParam, encryptionKey)])
-                .then(([videoEncrypted, pdfEncrypted]) => {
-                    // Convert encrypted data to base64 for inclusion in the URL
-                    const videoEncryptedBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(videoEncrypted)));
-                    const pdfEncryptedBase64 = btoa(String.fromCharCode.apply(null, new Uint8Array(pdfEncrypted)));
-
-                    // Include the encrypted data in the URL and open the viewport
-                    const url = `viewport.html?videoIds=${videoEncryptedBase64}&pdfIds=${pdfEncryptedBase64}`;
-                    window.open(url, '_blank');
-                })
-                .catch(error => console.error('Error encrypting data:', error));
-        }
-
-    </script>
 </body>
 
 </html>
