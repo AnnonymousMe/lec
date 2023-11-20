@@ -2,15 +2,15 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
+        <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+
     <style>
-        /* ... (styles remain unchanged) ... */
 body {
             font-family: 'Roboto', Arial, Helvetica, sans-serif;
-            background-color: #444;
+            background-color: #000;
             margin: 0;
         }
 
@@ -54,7 +54,7 @@ body {
         }
 
         .videos {
-            background-color: #444;
+            background-color: #000;
         }
 
         .video-section {
@@ -160,9 +160,11 @@ body {
 
     </style>
     <title>View Dock</title>
+
 </head>
 
 <body>
+
     <div class="categories">
         <section class="category-section">
             <button class="category" onclick="toggleCategory('LECTURE')" data-category="LECTURE">Lecture</button>
@@ -182,39 +184,77 @@ body {
 
     </div>
 
+
     <script>
-        function loadVideos(videoIds) {
-            const videoPlayer = document.getElementById('videoPlayer');
-            videoPlayer.innerHTML = ''; // Clear previous content
+  // Wait for the crypto library to be ready
+    window.addEventListener('DOMContentLoaded', (event) => {
+        if (crypto.subtle) {
+            console.log('Crypto library is ready.');
+        } else {
+            console.error('Crypto library is not available.');
+        }
+    });
+        function decryptData(encryptedData, key) {
+            const enc = new TextEncoder();
+            const encodedKey = enc.encode(key);
 
-            videoIds.forEach((videoId, index) => {
-                const iframe = document.createElement('iframe');
-                iframe.className = 'video-iframe';
-                iframe.src = `https://www.youtube.com/embed/${videoId}?rel=0&`;
-                iframe.frameBorder = '0';
-                iframe.allowFullscreen = true;
-                videoPlayer.appendChild(iframe);
-            });
-
-            document.getElementById('pdfSection').style.display = 'none';
+            return crypto.subtle.importKey(
+                'raw',
+                encodedKey,
+                { name: 'AES-CBC' },
+                false,
+                ['decrypt']
+            ).then(key => crypto.subtle.decrypt(
+                { name: 'AES-CBC', iv: encodedKey.slice(0, 16) },
+                key,
+                encryptedData
+            ));
         }
 
-        function loadDocuments(pdfIds) {
-            const pdfSection = document.getElementById('pdfSection');
-            pdfSection.innerHTML = ''; // Clear previous buttons
+        function loadDecryptedData(encryptedVideoIds, encryptedPdfIds) {
+            const decryptionKey = 'tejasvi';
 
-            pdfIds.forEach((pdfId, index) => {
-                const button = document.createElement('button');
-                button.className = 'download-button';
-                button.innerHTML = `Download Document ${index + 1}`;
-                button.onclick = function () {
-                    window.open(`https://drive.google.com/uc?export=download&id=${pdfId}`, '_blank');
-                };
-                pdfSection.appendChild(button);
-            });
+            try {
+                // Decode base64 and decrypt the data
+                const videoIdsArrayBuffer = Uint8Array.from(atob(encryptedVideoIds), c => c.charCodeAt(0)).buffer;
+                const pdfIdsArrayBuffer = Uint8Array.from(atob(encryptedPdfIds), c => c.charCodeAt(0)).buffer;
 
-            document.getElementById('pdfSection').style.display = 'flex';
-            document.getElementById('videoPlayer').innerHTML = ''; // Clear video player
+                Promise.all([decryptData(videoIdsArrayBuffer, decryptionKey), decryptData(pdfIdsArrayBuffer, decryptionKey)])
+                    .then(([videoIds, pdfIds]) => {
+                        // Parse the decrypted JSON strings
+                        const parsedVideoIds = JSON.parse(new TextDecoder().decode(videoIds));
+                        const parsedPdfIds = JSON.parse(new TextDecoder().decode(pdfIds));
+
+                        // Use the decrypted data as needed
+                        console.log('Decrypted Video IDs:', parsedVideoIds);
+                        console.log('Decrypted PDF IDs:', parsedPdfIds);
+
+                        // Continue with loading content or other actions...
+                        displayDecryptedData(parsedVideoIds, parsedPdfIds);
+                    })
+                    .catch(error => console.error('Error decrypting data:', error));
+            } catch (error) {
+                console.error('Error decoding base64:', error);
+            }
+        }
+
+        function displayDecryptedData(videoIds, pdfIds) {
+            // Implement your logic to display or use the decrypted data here
+            // For example, you can dynamically create video players, buttons, etc.
+            // based on the decrypted videoIds and pdfIds
+            console.log('Displaying Decrypted Data:', videoIds, pdfIds);
+        }
+
+        // Retrieve the encrypted data from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const encryptedVideoIds = urlParams.get('videoIds');
+        const encryptedPdfIds = urlParams.get('pdfIds');
+
+        // Decrypt and load the data
+        if (encryptedVideoIds && encryptedPdfIds) {
+            loadDecryptedData(encryptedVideoIds, encryptedPdfIds);
+        } else {
+            console.error('Encrypted data not found in the URL.');
         }
 
         function toggleCategory(category) {
@@ -227,35 +267,17 @@ body {
             activeButton.classList.add('active');
 
             const urlParams = new URLSearchParams(window.location.search);
-        const videoIdsParam = urlParams.get('videoIds');
-        const pdfIdsParam = urlParams.get('pdfIds');
+            const encryptedVideoIds = urlParams.get('videoIds');
+            const encryptedPdfIds = urlParams.get('pdfIds');
 
-        // Convert the JSON strings back to arrays
-        const videoIds = JSON.parse(decodeURIComponent(videoIdsParam));
-        const pdfIds = JSON.parse(decodeURIComponent(pdfIdsParam));
-
-        // Debugging: Print the values of videoIds and pdfIds
-        console.log('videoIds:', videoIds);
-        console.log('pdfIds:', pdfIds);
-        
-
-            // Debugging: Print the values of pdfIds and videoIds
-            //console.log('pdfIds:', pdfIds);
-            //console.log('videoIds:', videoIds);
-
-            if (category === 'LECTURE') {
-                loadVideos(videoIds);
-            } else if (category === 'NOTES') {
-                loadDocuments(pdfIds);
+            // Decrypt and load the data
+            if (encryptedVideoIds && encryptedPdfIds) {
+                loadDecryptedData(encryptedVideoIds, encryptedPdfIds);
+            } else {
+                console.error('Encrypted data not found in the URL.');
             }
         }
-
-        // Initialize with the lecture section on page load
-        window.onload = function () {
-            toggleCategory('LECTURE');
-        };
     </script>
-
 </body>
 
 </html>
